@@ -14,12 +14,11 @@ describe('test/index.test.ts', () => {
   afterEach(mock.restore);
 
   it('should POST 200 /:id', async () => {
-    const res = await app.httpRequest().post('/someId')
-      .send({
-        name: 'xiekw2010',
-        description: 'desc',
-        email: 'xiekw2010@gmail.com'
-      });
+    const res = await app.httpRequest().post('/someId').send({
+      name: 'xiekw2010',
+      description: 'desc',
+      email: 'xiekw2010@gmail.com',
+    });
     assert(res.status === 200);
     assert(res.body.n === 'xiekw2010');
     assert(res.body.d === 'desc');
@@ -28,11 +27,10 @@ describe('test/index.test.ts', () => {
   });
 
   it('should POST 422 /:id', async () => {
-    const res = await app.httpRequest().post('/someId')
-      .send({
-        name: 'xiekw2010',
-        email: 'xiekw2010gmail.com'
-      });
+    const res = await app.httpRequest().post('/someId').send({
+      name: 'xiekw2010',
+      email: 'xiekw2010gmail.com',
+    });
     assert(res.status === 422);
   });
 });
