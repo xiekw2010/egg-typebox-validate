@@ -307,6 +307,10 @@ if (valid) {
 
 ```
 
+## 怎么写 typebox 定义
+
+参考 [https://github.com/sinclairzx81/typebox#types](https://github.com/sinclairzx81/typebox#types)
+
 ## License
 
 [MIT](LICENSE)
