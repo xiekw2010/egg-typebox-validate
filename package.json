@@ -58,9 +58,9 @@
     "test-local": "egg-bin test",
     "benchmark": "node ./benchmark/ajv-vs-paramter.mjs",
     "cov": "egg-bin cov",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint app --ext .ts",
     "ci": "npm run lint && npm run cov",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "files": [
     "index.d.ts",

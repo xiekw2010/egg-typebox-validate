@@ -7,7 +7,7 @@ export default () => {
     csrf: {
       ignoreJSON: true,
     },
-  }
+  };
   return {
     ...config,
   };

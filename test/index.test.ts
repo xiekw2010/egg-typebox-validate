@@ -1,5 +1,5 @@
-import mock from 'egg-mock';
 import * as assert from 'assert';
+import mock from 'egg-mock';
 
 describe('test/index.test.ts', () => {
   let app: any;
