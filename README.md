@@ -229,7 +229,7 @@ async create() {
 
 egg-typebox-validate 底层使用的是 [ajv](https://github.com/ajv-validator/ajv), 官网上宣称是 _**The fastest JSON validator for Node.js and browser.**_
 
-结论是在静态化的场景下，ajv 的性能要比 parameter 好得多，快不是一个数量级，详见[benchmark](./benchmark/ajv-vs-paramter.mjs) 
+结论是在静态化的场景下，ajv 的性能要比 parameter 好得多，快不是一个数量级，详见[benchmark](./benchmark/ajv-vs-parameter.mjs) 
 
 ```js
 suite
