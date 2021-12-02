@@ -35,6 +35,21 @@ const DATA = {
 const ajv = getAjvInstance();
 const p = new Parameter();
 
+const typeboxRule = Type.Object({
+  name: Type.String(),
+  description: Type.Optional(Type.String()),
+  location: Type.Enum({shanghai: 'shanghai', hangzhou: 'hangzhou'}),
+})
+
+const parameterRule = {
+  name: 'string',
+  description: {
+    type: 'string',
+    required: false,
+  },
+  location: ['shanghai', 'hangzhou'],
+}
+
 // add tests
 suite
   .add('#ajv', function() {
@@ -44,6 +59,9 @@ suite
       location: Type.Enum({shanghai: 'shanghai', hangzhou: 'hangzhou'}),
     })
     ajv.validate(rule, DATA);
+  })
+  .add('#ajv define once', function() {
+    ajv.validate(typeboxRule, DATA);
   })
   .add('#parameter', function() {
     const rule = {
@@ -55,6 +73,9 @@ suite
       location: ['shanghai', 'hangzhou'],
     }
     p.validate(rule, DATA);
+  })
+  .add('#parameter define once', function() {
+    p.validate(parameterRule, DATA);
   })
   // add listeners
   .on('cycle', function(event) {
