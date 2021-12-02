@@ -1,6 +1,6 @@
 {
   "name": "egg-typebox-validate",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "another validate for typescript egg projects",
   "eggPlugin": {
     "name": "typeboxValidate"
@@ -53,14 +53,14 @@
   "scripts": {
     "build": "npm run tsc",
     "tsc": "tsc -p tsconfig.json",
-    "clean": "rm -f app/**/*.js",
+    "clean": "rm -rf app/**/*.js",
     "test": "npm run lint -- --fix && npm run test-local",
     "test-local": "egg-bin test",
     "benchmark": "node ./benchmark/ajv-vs-paramter.mjs",
     "cov": "egg-bin cov",
     "lint": "eslint . --ext .ts",
     "ci": "npm run lint && npm run cov",
-    "prepublish": "npm run tsc"
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "index.d.ts",

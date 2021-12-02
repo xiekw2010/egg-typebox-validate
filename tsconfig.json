@@ -21,7 +21,7 @@
     "inlineSourceMap": true,
     "esModuleInterop": false
   },
-  "exclude": [
-    "node_modules*",
+  "include": [
+    "app",
   ]
 }
