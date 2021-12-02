@@ -32,6 +32,8 @@ const DATA = {
   location: 'shanghai',
 }
 
+const ajv = getAjvInstance();
+const p = new Parameter();
 
 // add tests
 suite
@@ -41,7 +43,6 @@ suite
       description: Type.Optional(Type.String()),
       location: Type.Enum({shanghai: 'shanghai', hangzhou: 'hangzhou'}),
     })
-    const ajv = getAjvInstance();
     ajv.validate(rule, DATA);
   })
   .add('#parameter', function() {
@@ -53,7 +54,6 @@ suite
       },
       location: ['shanghai', 'hangzhou'],
     }
-    const p = new Parameter();
     p.validate(rule, DATA);
   })
   // add listeners
@@ -66,26 +66,3 @@ suite
   // run async
   .run({ 'async': true });
 
-
-//const start = new Date();
-//const rule = Type.Object({
-//  name: Type.String(),
-//  description: Type.Optional(Type.String()),
-//  location: Type.Enum({shanghai: 'shanghai', hangzhou: 'hangzhou'}),
-//})
-//const ajv = getAjvInstance();
-//ajv.validate(rule, DATA);
-//console.log('end is', new Date() - start);
-
-//const start = new Date();
-//const rule = {
-//  name: 'string',
-//  description: {
-//    type: 'string',
-//    required: false,
-//  },
-//  location: ['shanghai', 'hangzhou'],
-//}
-//const p = new Parameter();
-//p.validate(rule, DATA);
-//console.log('end is', new Date() - start);

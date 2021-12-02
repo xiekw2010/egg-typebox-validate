@@ -20,10 +20,10 @@ const getAjvInstance = () =>
   ])
     .addKeyword('kind')
     .addKeyword('modifier');
+const ajv = getAjvInstance();
 
 export default {
   tValidate(schema: Schema, data: unknown): boolean {
-    const ajv = getAjvInstance();
     const res = ajv.validate(schema, data);
     if (!res) {
       this.throw(422, 'Validation Failed', {
@@ -37,7 +37,6 @@ export default {
   },
 
   tValidateWithoutThrow(schema: Schema, data: unknown): boolean {
-    const ajv = getAjvInstance();
     const res = ajv.validate(schema, data);
     return res;
   },

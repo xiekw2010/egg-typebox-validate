@@ -1,10 +1,5 @@
 import { EggPlugin } from 'egg';
 
-const plugin: EggPlugin = {
-  typeboxValidate: {
-    enable: true,
-    package: 'egg-typebox-validate',
-  },
-};
+const plugin: EggPlugin = {};
 
 export default plugin;

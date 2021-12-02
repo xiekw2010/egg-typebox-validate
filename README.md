@@ -1,5 +1,27 @@
 # egg-typebox-validate
 
+[![NPM version][npm-image]][npm-url]
+[![build status][travis-image]][travis-url]
+[![Test coverage][codecov-image]][codecov-url]
+[![David deps][david-image]][david-url]
+[![Known Vulnerabilities][snyk-image]][snyk-url]
+[![npm download][download-image]][download-url]
+
+[npm-image]: https://img.shields.io/npm/v/egg-typebox-validate.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/egg-typebox-validate
+[travis-image]: https://img.shields.io/travis/xiekw2010/egg-typebox-validate.svg?style=flat-square
+[travis-url]: https://travis-ci.org/xiekw2010/egg-typebox-validate
+[codecov-image]: https://img.shields.io/codecov/c/github/xiekw2010/egg-typebox-validate.svg?style=flat-square
+[codecov-url]: https://codecov.io/github/xiekw2010/egg-typebox-validate?branch=master
+[david-image]: https://img.shields.io/david/xiekw2010/egg-typebox-validate.svg?style=flat-square
+[david-url]: https://david-dm.org/xiekw2010/egg-typebox-validate
+[snyk-image]: https://snyk.io/test/npm/egg-typebox-validate/badge.svg?style=flat-square
+[snyk-url]: https://snyk.io/test/npm/egg-typebox-validate
+[download-image]: https://img.shields.io/npm/dm/egg-typebox-validate.svg?style=flat-square
+[download-url]: https://npmjs.org/package/egg-typebox-validate
+
+基于 [typebox](https://github.com/sinclairzx81/typebox) 和 [ajv](https://github.com/ajv-validator/ajv) 封装的 egg validate 插件。
+
 ## 为什么有这个项目
 
 一直以来，在 typescript 的 egg 项目里，对参数校验 ctx.validate 是比较难受的，比如:
@@ -81,6 +103,11 @@ class HomeController extends Controller {
 export default HomeController;
 ```
 
+用 `Static<typeof typebox>` 推导出的 ts 类型：
+
+![tpian](https://gw.alipayobjects.com/zos/antfincdn/XjH2W7lEB/ad5b628c-9ff9-456d-bb7b-2fb0ac418f1c.png)
+
+
 ## 怎么使用
 
 1. 安装
@@ -149,11 +176,11 @@ async create() {
     TYPEBOX_NAME_DESC_OBJECT,
     Type.Object({ avatar: Type.String() }),
   ])
-  ctx.tValidate(USER_TYPEBOX, ctx.body);
+  ctx.tValidate(USER_TYPEBOX, ctx.request.body);
   
   // 在编辑器都能正确得到提示
   // type User = { name: string; description?: string } & { avatar: string }
-  const { name, description, avatar } = ctx.body as Static<typeof USER_TYPEBOX>;
+  const { name, description, avatar } = ctx.request.body as Static<typeof USER_TYPEBOX>;
   ...
 }
 
@@ -164,11 +191,11 @@ async create() {
     TYPEBOX_NAME_DESC_OBJECT,
     Type.Object({ location: Type.String() }),
   ])
-  ctx.tValidate(PHOTO_TYPEBOX, ctx.body);
+  ctx.tValidate(PHOTO_TYPEBOX, ctx.request.body);
 
   // 在编辑器都能正确得到提示
   // type Photo = { name: string; description?: string } & { location: string }
-  const { name, description, location } = ctx.body as Static<typeof PHOTO_TYPEBOX>;
+  const { name, description, location } = ctx.request.body as Static<typeof PHOTO_TYPEBOX>;
   ...
 }
 ```
@@ -192,14 +219,94 @@ async create() {
 'regex'
 ```
 
-3. 写定义的时候写的是 js 对象(`Type.Number()`)，有提示不容易写错。写 parameter 规范的时候，写字符串(`'nunber'`)有时候会不小心写错 😂。
+3. 写定义的时候写的是 js 对象(`Type.Number()`)，有类型提示，语法也比较简单，有提示不容易写错；写 parameter 规范的时候，写字符串(`'nunber'`)有时候会不小心写错 😂，再加上它对于复杂嵌套对象的写法还是比较困难的，我每次都会查文档，官方的文档也不全。但是 typebox，就很容易举一反三了。
 
 ## 与 egg-validate 性能比较
 
-egg-typebox-validate 底层使用的是 [ajv](https://github.com/ajv-validator/ajv), 官网上宣称 `The fastest JSON validator for Node.js and browser.`
+egg-typebox-validate 底层使用的是 [ajv](https://github.com/ajv-validator/ajv), 官网上宣称是 _**The fastest JSON validator for Node.js and browser.**_
 
-但是 parameter 跑了 [benchmark](./benchmark/ajv-vs-paramter.mjs) 后，它完败（不是一个数量级的），毕竟底层实现是完全不一样的。
+但是 parameter 跑了 [benchmark](./benchmark/ajv-vs-paramter.mjs) 后，它完败（不是一个数量级的），毕竟底层实现是完全不一样的，一个是按标准 json-schema 规范去做解析的，另一个是轻量简单处理。
+
+对于最简单的 case：
+
+```js
+suite
+  .add('#ajv', function() {
+    const rule = Type.Object({
+      name: Type.String(),
+      description: Type.Optional(Type.String()),
+      location: Type.Enum({shanghai: 'shanghai', hangzhou: 'hangzhou'}),
+    })
+    ajv.validate(rule, DATA);
+  })
+  .add('#parameter', function() {
+    const rule = {
+      name: 'string',
+      description:
+        type: 'string',
+        required: false,
+      },
+      location: ['shanghai', 'hangzhou'],
+    }
+    p.validate(rule, DATA);
+  })
+```
+
+在 MacBook Pro(2.2 GHz 六核Intel Core i7)上，跑出来结果是:
+
+```bash
+#ajv x 728 ops/sec ±6.82% (73 runs sampled)
+#parameter x 2,699,754 ops/sec ±2.30% (86 runs sampled)
+Fastest is #parameter
+```
+
+翻译一下就是:
+
+- ajv 每跑一次大概是 1.3ms
+- parameter 每跑一次大概是 0.0003ms
 
 ## 从 egg-validate 迁移到这个库的成本
 
+1. 会有 1ms 左右的性能损耗。但不管怎么说，ajv 是 node 最快的 json-schema validator 了。
+2. 把原来字符串式 js 对象写法迁移到 typebox 的对象写法。typebox 的写法还算简单和容易举一反三。
 
+## 总结
+
+切换到 egg-typebox-validate 校验后：
+
+1. 可以解决 ts 项目中参数校验代码写两遍类型的问题，提升代码重用率，可维护性等问题。
+2. 用标准 json-schema 来做参数校验，内置更多类型
+3. 建议渐进式迁移，从部分简单方法开始把 `ctx.validate` 改成 `ctx.tValidate`
+
+## API
+
+1. `ctx.tValidate` 参数校验失败后，抛出错误，内部实现（错误码、错误标题等）逻辑和 `ctx.validate` 的保持一致
+
+```diff
++ import { Static, Type } from '@sinclair/typebox';
+
+ctx.tValidate(Type.Object({
+  name: Type.String(),
+}), ctx.request.body);
+```
+
+2. `ctx.tValidateWithoutThrow` 直接校验，不抛出错误
+
+```diff
++ import { Static, Type } from '@sinclair/typebox';
+
+const valid = ctx.tValidateWithoutThrow(Type.Object({
+  name: Type.String(),
+}), ctx.request.body);
+
+if (valid) {
+  ...
+} else {
+  ...
+}
+
+```
+
+## License
+
+[MIT](LICENSE)
