@@ -40,6 +40,4 @@ export default {
     const res = ajv.validate(schema, data);
     return res;
   },
-
-  getAjv: getAjvInstance(),
 };

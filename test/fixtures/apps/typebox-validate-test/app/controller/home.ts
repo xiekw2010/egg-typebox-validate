@@ -9,12 +9,14 @@ export default class HomeController extends Controller {
       description: Type.Optional(Type.String()),
       email: Type.String({ format: 'email'}),
     })
-    ctx.tValidate(typebox, ctx.request.body);
+    const res1 = ctx.tValidate(typebox, ctx.request.body);
+    const res2 = ctx.tValidateWithoutThrow(typebox, ctx.request.body)
     const p: Static<typeof typebox> = ctx.request.body;
     ctx.body = {
       n: p.name,
       d: p.description,
       e: p.email,
+      same: res1 === res2,
     }
   }
 }

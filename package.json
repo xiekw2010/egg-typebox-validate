@@ -53,23 +53,18 @@
   "scripts": {
     "build": "npm run tsc",
     "tsc": "tsc -p tsconfig.json",
-    "clean": "tsc -b --clean",
+    "clean": "rm -f app/**/*.js",
     "test": "npm run lint -- --fix && npm run test-local",
     "test-local": "egg-bin test",
     "benchmark": "node ./benchmark/ajv-vs-paramter.mjs",
     "cov": "egg-bin cov",
     "lint": "eslint . --ext .ts",
     "ci": "npm run lint && npm run cov",
-    "prepublishOnly": "npm run build"
+    "prepublish": "npm run tsc"
   },
   "files": [
-    "app.js",
-    "typing/**/*.d.ts",
-    "src/**/*.js",
-    "app/**/*.js",
-    "lib/**/*.js",
-    "template/**/*.ejs",
-    "utils/**/*.js"
+    "index.d.ts",
+    "app/**/*.js"
   ],
   "ci": {
     "type": "travis",

@@ -24,6 +24,7 @@ describe('test/index.test.ts', () => {
     assert(res.body.n === 'xiekw2010');
     assert(res.body.d === 'desc');
     assert(res.body.e === 'xiekw2010@gmail.com');
+    assert(res.body.same === true);
   });
 
   it('should POST 422 /:id', async () => {
