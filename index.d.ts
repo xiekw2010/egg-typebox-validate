@@ -4,6 +4,5 @@ declare module 'egg' {
   interface Context {
     tValidate: (schema: Schema, data: unknown) => boolean;
     tValidateWithoutThrow: (schema: Schema, data: unknown) => boolean;
-    getAjv: () => Ajv;
   }
 }
