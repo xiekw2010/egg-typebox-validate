@@ -87,3 +87,12 @@ suite
   // run async
   .run({ 'async': true });
 
+/*
+MacBook Pro(2.2 GHz 六核Intel Core i7)
+
+#ajv x 941 ops/sec ±3.97% (73 runs sampled)
+#ajv define once x 17,188,370 ops/sec ±11.53% (73 runs sampled)
+#parameter x 2,544,118 ops/sec ±4.68% (79 runs sampled)
+#parameter define once x 2,541,590 ops/sec ±5.34% (77 runs sampled)
+Fastest is #ajv define once
+*/

@@ -82,8 +82,8 @@ class HomeController extends Controller {
 
 +   const paramsSchema = Type.Object({
 +     id: Type.String(),
-+     name: Type.String(),
-+     timestamp: Type.Integer(),
++     name: Type.Optional(Type.String()),
++     timestamp: Type.Optional(Type.Integer()),
 +   });
     // 直接校验
 +   ctx.tValidate(paramsSchema, ctx.params);
@@ -112,7 +112,7 @@ export default HomeController;
 1. 安装
 
 ```js
-npm i egg-typebox-validate -D
+npm i egg-typebox-validate -S
 ```
 
 2. 在项目中配置
@@ -132,19 +132,24 @@ const plugin: EggPlugin = {
 ```diff
 + import { Static, Type } from '@sinclair/typebox';
 
+// 写在 controller 外面，静态化，性能更好，下面有 benchmark
++ const paramsSchema = Type.Object({
++   id: Type.String(),
++   name: Type.String(),
++   timestamp: Type.Integer(),
++ });
+
+// 可以直接 export 出去，给下游 service 使用
++ export type ParamsType = Static<typeof paramsSchema>;
+
 class HomeController extends Controller {
   async index() {
     const { ctx } = this;
     
-+   const paramsSchema = Type.Object({
-+     id: Type.String(),
-+     name: Type.String(),
-+     timestamp: Type.Integer(),
-+   });
     // 直接校验
 +   ctx.tValidate(paramsSchema, ctx.params);
     // 不用写 js 类型定义
-+   const params: Static<typeof paramsSchema> = ctx.params;
++   const params: ParamsType = ctx.params;
 
     ...
   }
@@ -224,9 +229,7 @@ async create() {
 
 egg-typebox-validate 底层使用的是 [ajv](https://github.com/ajv-validator/ajv), 官网上宣称是 _**The fastest JSON validator for Node.js and browser.**_
 
-但是 parameter 跑了 [benchmark](./benchmark/ajv-vs-paramter.mjs) 后，它完败（不是一个数量级的），毕竟底层实现是完全不一样的，一个是按标准 json-schema 规范去做解析的，另一个是轻量简单处理。
-
-对于最简单的 case：
+结论是在静态化的场景下，ajv 的性能要比 parameter 好得多，快不是一个数量级，详见[benchmark](./benchmark/ajv-vs-paramter.mjs) 
 
 ```js
 suite
@@ -238,10 +241,13 @@ suite
     })
     ajv.validate(rule, DATA);
   })
+  .add('#ajv define once', function() {
+    ajv.validate(typeboxRule, DATA);
+  })
   .add('#parameter', function() {
     const rule = {
       name: 'string',
-      description:
+      description: {
         type: 'string',
         required: false,
       },
@@ -249,33 +255,33 @@ suite
     }
     p.validate(rule, DATA);
   })
+  .add('#parameter define once', function() {
+    p.validate(parameterRule, DATA);
+  })
 ```
 
 在 MacBook Pro(2.2 GHz 六核Intel Core i7)上，跑出来结果是:
 
 ```bash
-#ajv x 728 ops/sec ±6.82% (73 runs sampled)
-#parameter x 2,699,754 ops/sec ±2.30% (86 runs sampled)
-Fastest is #parameter
+#ajv x 941 ops/sec ±3.97% (73 runs sampled)
+#ajv define once x 17,188,370 ops/sec ±11.53% (73 runs sampled)
+#parameter x 2,544,118 ops/sec ±4.68% (79 runs sampled)
+#parameter define once x 2,541,590 ops/sec ±5.34% (77 runs sampled)
+Fastest is #ajv define once
 ```
-
-翻译一下就是:
-
-- ajv 每跑一次大概是 1.3ms
-- parameter 每跑一次大概是 0.0003ms
 
 ## 从 egg-validate 迁移到这个库的成本
 
-1. 会有 1ms 左右的性能损耗。但不管怎么说，ajv 是 node 最快的 json-schema validator 了。
-2. 把原来字符串式 js 对象写法迁移到 typebox 的对象写法。typebox 的写法还算简单和容易举一反三。
+1. 把原来字符串式 js 对象写法迁移到 typebox 的对象写法。typebox 的写法还算简单和容易举一反三
+2. 把 `ctx.validate` 替换成 `ctx.tValidate`
+3. 建议渐进式迁移，先迁简单的，对业务影响不大的
 
 ## 总结
 
 切换到 egg-typebox-validate 校验后：
 
-1. 可以解决 ts 项目中参数校验代码写两遍类型的问题，提升代码重用率，可维护性等问题。
-2. 用标准 json-schema 来做参数校验，内置更多类型
-3. 建议渐进式迁移，从部分简单方法开始把 `ctx.validate` 改成 `ctx.tValidate`
+1. 可以解决 ts 项目中参数校验代码写两遍类型的问题，提升代码重用率，可维护性等问题
+2. 用标准 json-schema 来做参数校验，是更加标准的业界做法，内置更多业界标准模型
 
 ## API
 
