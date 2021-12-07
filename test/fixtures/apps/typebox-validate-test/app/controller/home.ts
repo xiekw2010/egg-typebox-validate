@@ -6,7 +6,7 @@ export default class HomeController extends Controller {
     const { ctx } = this;
     const typebox = Type.Object({
       name: Type.String(),
-      description: Type.Optional(Type.String()),
+      description: Type.Optional(Type.String( { transform: ["trim", "toLowerCase"], minLength: 1, maxLength: 4 })),
       email: Type.String({ format: 'email' }),
     });
     const res1 = ctx.tValidate(typebox, ctx.request.body);

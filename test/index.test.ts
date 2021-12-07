@@ -33,4 +33,17 @@ describe('test/index.test.ts', () => {
     });
     assert(res.status === 422);
   });
+
+  it('should POST 200 /:id trim', async () => {
+    const res = await app.httpRequest().post('/someId').send({
+      name: 'xiekw2010',
+      description: 'desc  ',
+      email: 'xiekw2010@gmail.com',
+    });
+    assert(res.status === 200);
+    assert(res.body.n === 'xiekw2010');
+    assert(res.body.d === 'desc');
+    assert(res.body.e === 'xiekw2010@gmail.com');
+    assert(res.body.same === true);
+  });
 });

@@ -316,6 +316,23 @@ if (valid) {
 
 参考 [https://github.com/sinclairzx81/typebox#types](https://github.com/sinclairzx81/typebox#types)
 
+## 支持 ajv 对 string 的 transform 校验
+
+比如:
+
+```js
+const body = { name: '  david   '}
+
+ctx.tValidate(Type.Object({
+  name: Type.String({ minLength: 1, maxLength: 5, transform: ['trim'] })
+}), body)
+```
+
+1. 是可以通过校验的
+2. 会对 body 有副作用，改写 name 字段，trim name 字段，body 会变成 `{ name: 'david' }`
+
+更多 ajv 对 string 的 transform 操作，详见 [https://ajv.js.org/packages/ajv-keywords.html#transform](https://ajv.js.org/packages/ajv-keywords.html#transform)
+
 ## License
 
 [MIT](LICENSE)

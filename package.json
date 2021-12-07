@@ -1,6 +1,6 @@
 {
   "name": "egg-typebox-validate",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "another validate for typescript egg projects",
   "eggPlugin": {
     "name": "typeboxValidate"
@@ -18,7 +18,8 @@
   "dependencies": {
     "@sinclair/typebox": "^0.23.0",
     "ajv": "^8.8.2",
-    "ajv-formats": "^2.1.1"
+    "ajv-formats": "^2.1.1",
+    "ajv-keywords": "^5.1.0"
   },
   "devDependencies": {
     "@types/assert": "^1.4.2",
