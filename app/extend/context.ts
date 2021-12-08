@@ -1,10 +1,10 @@
 import addFormats from 'ajv-formats';
 import Ajv, { Schema } from 'ajv/dist/2019';
-import keyWords from 'ajv-keywords'
+import keyWords from 'ajv-keywords';
 
 const getAjvInstance = () => {
   const ajv = new Ajv();
-  keyWords(ajv, "transform")
+  keyWords(ajv, 'transform');
   addFormats(ajv, [
     'date-time',
     'time',
@@ -24,7 +24,7 @@ const getAjvInstance = () => {
     .addKeyword('kind')
     .addKeyword('modifier');
   return ajv;
-}
+};
 
 const ajv = getAjvInstance();
 
