@@ -333,6 +333,87 @@ ctx.tValidate(Type.Object({
 
 更多 ajv 对 string 的 transform 操作，详见 [https://ajv.js.org/packages/ajv-keywords.html#transform](https://ajv.js.org/packages/ajv-keywords.html#transform)
 
+## 如何写自定义校验规则
+
+比如想校验上传的 string 是否是合法的 json string，我们可以对 Type.String 的 format 做 patch，针对 string 加一个 'json-string' 的 format
+
+1. 在 config.default.ts 里 patch 默认 ajv 实例的规则
+
+```ts
+config.typeboxValidate = {
+  patchAjv: (ajv) => {
+    ajv.addFormat('json-string', {
+      type: 'string',
+      validate: (x) => {
+        try {
+          JSON.parse(x);
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+    });
+  }
+}
+```
+
+2. 使用
+
+```ts
+async someFunc() {
+  const typebox = Type.Object({
+    jsonString: Type.Optional(Type.String({ format: 'json-string' })),
+  });
+  
+  const res = ctx.tValidate(typebox, { a: '{"a":1}' }) // valid
+  const res = ctx.tValidate(typebox, { a: 'wrong{"a":1}' }) // invalid
+}
+```
+
+当然也可以定义其他各种规则，比如我们常见的 semver 规范，那可以在我们的配置里继续 patch ajv string format
+
+```diff
++ import { valid } from 'semver';
+
+config.typeboxValidate = {
+  patchAjv: (ajv) => {
+    ajv.addFormat('json-string', {
+      type: 'string',
+      validate: (x) => {
+        try {
+          JSON.parse(x);
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+    });
+    
++   ajv.addFormat("semver", {
++     type: "string",
++     validate: (x) => valid(x) != null,
++   })
+  }
+}
+```
+
+使用例子：
+
+```ts
+async someFunc() {
+  const typebox = Type.Object({
+    version: Type.String({ format: 'semver' }),
+  });
+  
+  const res = ctx.tValidate(typebox, { a: '1.0.0' }) // valid
+  const res = ctx.tValidate(typebox, { a: 'a.b.c' }) // invalid
+}
+```
+
+上面例子是 string 的例子，当然也可以对其他类型做其他 patch，比如 number，array 等，限制你的只有想象力。
+
+全部 json-schema 支持的类型：[https://json-schema.org/understanding-json-schema/reference/type.html](https://json-schema.org/understanding-json-schema/reference/type.html)
+
 ## License
 
 [MIT](LICENSE)
