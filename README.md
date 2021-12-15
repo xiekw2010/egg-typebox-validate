@@ -164,7 +164,7 @@ export default HomeController;
 
 Show me the code!
 
-```js
+```ts
 export const TYPEBOX_NAME_DESC_OBJECT = Type.Object({
   name: Type.String(),
   description: Type.Optional(Type.String()),
@@ -307,10 +307,39 @@ const valid = ctx.tValidateWithoutThrow(Type.Object({
 if (valid) {
   ...
 } else {
+  const errors = this.app.ajv.errors
+  // handle errors
   ...
 }
-
 ```
+
+3. ⭐⭐⭐ 装饰器 decorator `@Validate([ [rule1, ctx => ctx.xx1], [rule2, ctx => ctx.xx2] ])` 调用（写法更干净，推荐使用!️）
+
+```diff
++ import { Validate } from 'egg-typebox-validate/decorator';
+
+class HomeController extends Controller {
++ @Validate([
++   [paramsSchema, ctx => ctx.params],
++   [bodySchema, ctx => ctx.request.body],
++ ])
+  async index() {
+    const { ctx } = this;
+    
+    // 直接校验
+-   ctx.tValidate(paramsSchema, ctx.params);
+-   ctx.tValidate(bodySchema, ctx.request.body);
+    // 不用写 js 类型定义
+    const params: ParamsType = ctx.params;
+
+    ...
+  }
+}
+
+export default HomeController;
+```
+
+目前装饰器只支持有 `this.ctx` 的 class 上使用，比如 controller，service 等。更多使用案例可以看这个项目里写的测试用例。
 
 ## 怎么写 typebox 定义
 

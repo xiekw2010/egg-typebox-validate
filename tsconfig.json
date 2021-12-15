@@ -23,6 +23,7 @@
   },
   "include": [
     "app",
-    "app.ts"
+    "app.ts",
+    "decorator.ts"
   ]
 }

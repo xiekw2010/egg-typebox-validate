@@ -103,4 +103,45 @@ describe('test/index.test.ts', () => {
     });
     assert(res.status === 422);
   });
+
+  it('should PATCH 200 /:id tValidateWithoutThrow', async () => {
+    let res = await app.httpRequest().patch('/someId').send({
+      name: 'xiekw2010',
+      description: 'desc  ',
+      email: 'xiekw2010@gmail.com',
+      version: '1.0.0',
+    });
+    assert(res.status === 200);
+    assert(res.body.message === 'ok');
+
+    res = await app.httpRequest().patch('/someId').send({
+      name: 'xiekw2010',
+      description: 'desc  ',
+      email: 'xiekw2010@gmail.com',
+      version: 'a.b.c',
+    });
+    assert(res.status === 422);
+    assert(res.body.errors[0].message.includes('semver'));
+
+    res = await app.httpRequest().patch('/someId').send({
+      name: 'xiekw2010',
+      description: 22,
+      email: 'xiekw2010gmail.com',
+      version: 'a.b.c',
+    });
+    assert(res.status === 422);
+    assert(res.body.errors.length === 1);
+    assert(res.body.errors[0].message.includes('string'));
+  });
+
+  it('should DELETE 200 /:id decorator', async () => {
+    let res = await app.httpRequest().delete('/someId').send({
+      name: 'xiekw2010',
+      description: 'desc  ',
+      email: 'xiekw2010@gmail.com',
+      version: '1.0.0',
+    });
+    assert(res.status === 200);
+    assert(res.body.version === '1.0.0');
+  });
 });

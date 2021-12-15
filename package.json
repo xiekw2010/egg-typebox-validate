@@ -1,6 +1,6 @@
 {
   "name": "egg-typebox-validate",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "another validate for typescript egg projects",
   "eggPlugin": {
     "name": "typeboxValidate"
@@ -56,19 +56,21 @@
     "build": "npm run tsc",
     "tsc": "tsc -p tsconfig.json",
     "tsc:noEmit": "tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf app/**/*.js && rm -rf app.js",
-    "test": "npm run lint -- --fix && npm run test-local",
+    "clean": "rm -rf app/**/*.js && rm -rf *.js",
+    "test": "npm run lint && npm run test-local",
     "test-local": "egg-bin test",
     "benchmark": "node ./benchmark/ajv-vs-parameter.mjs",
     "cov": "egg-bin cov",
-    "lint": "eslint app --ext .ts",
+    "lint": "eslint app --ext .ts --fix",
     "ci": "npm run lint && npm run cov",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "files": [
     "index.d.ts",
     "app/**/*.js",
-    "app.js"
+    "app.js",
+    "decorator.js",
+    "decorator.d.ts"
   ],
   "ci": {
     "type": "travis",
