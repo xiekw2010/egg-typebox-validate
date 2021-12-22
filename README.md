@@ -321,7 +321,7 @@ if (valid) {
 class HomeController extends Controller {
 + @Validate([
 +   [paramsSchema, ctx => ctx.params],
-+   [bodySchema, ctx => ctx.request.body],
++   [bodySchema, ctx => ctx.request.body, (ctx, errors) => 'MyErrorPrefix: ' + errors.map(e => e.message).join(', ')],
 + ])
   async index() {
     const { ctx } = this;

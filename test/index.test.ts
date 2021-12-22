@@ -144,4 +144,24 @@ describe('test/index.test.ts', () => {
     assert(res.status === 200);
     assert(res.body.version === '1.0.0');
   });
+
+  it('should DELETE 422 /:id decorator', async () => {
+    let res = await app.httpRequest().delete('/someId').send({
+      name: 'xiekw2010',
+      description: 'desc  ',
+      email: 'xiekw2010@gmail.com',
+      version: 'a.b.c',
+    });
+    assert(res.status === 422);
+    assert(res.text.includes('kaiwei custom error: must match format "semver"'));
+
+    res = await app.httpRequest().delete('/someId').send({
+      name: null,
+      description: 'desc  ',
+      email: 'xiekw2010@gmail.com',
+      version: 'a.b.c',
+    });
+    assert(res.status === 422);
+    assert(res.text.includes('kaiwei custom error: must be string'));
+  });
 });

@@ -50,7 +50,7 @@ export default class HomeController extends Controller {
 
   @Validate([
     [TYPEBOX_ID, ctx => ctx.params],
-    [TYPEBOX_BODY, ctx => ctx.request.body],
+    [TYPEBOX_BODY, ctx => ctx.request.body, (ctx, errors) => 'kaiwei custom error: ' + errors.map(e => e.message).join(':')],
   ])
   public async delete() {
     const { ctx } = this;
