@@ -1,6 +1,6 @@
 {
   "name": "egg-typebox-validate",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "another validate for typescript egg projects",
   "eggPlugin": {
     "name": "typeboxValidate"
@@ -70,7 +70,9 @@
     "app/**/*.js",
     "app.js",
     "decorator.js",
-    "decorator.d.ts"
+    "decorator.d.ts",
+    "typebox.js",
+    "typebox.d.ts"
   ],
   "ci": {
     "type": "travis",
