@@ -7,7 +7,7 @@ type CustomErrorMessage = (ctx: Context, errors: ErrorObject[]) => string;
 type GetData =  (ctx: Context, args: unknown[]) => unknown;
 export type ValidateRule = [TSchema, GetData, CustomErrorMessage?];
 
-export function ValidateFactory(customHandler: (ctx: Context, data: unknown, schema: TSchema, customError?: CustomErrorMessage) => void) {
+export function ValidateFactory(customHandler: (ctx: Context, data?: unknown, schema?: TSchema, customError?: CustomErrorMessage) => void) {
   return function Validate(rules: ValidateRule[]): MethodDecorator {
     return (_, __, descriptor: PropertyDescriptor): PropertyDescriptor => {
       const fn = descriptor.value;

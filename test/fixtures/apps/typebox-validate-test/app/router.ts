@@ -5,4 +5,5 @@ export default (app: Application) => {
   router.post('/:id', controller.home.create);
   router.patch('/:id', controller.home.update);
   router.delete('/:id', controller.home.delete);
+  router.put('/:id', controller.home.put);
 };

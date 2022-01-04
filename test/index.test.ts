@@ -34,6 +34,15 @@ describe('test/index.test.ts', () => {
     assert(res.status === 422);
   });
 
+  it('should PUT 422 /:id with redirect', async () => {
+    const res = await app.httpRequest().put('/someId').send({
+      name: 'xiekw2010',
+      email: 'xiekw2010gmail.com',
+    });
+    assert(res.status === 302);
+    assert(/Redirecting.*\/422/.test(res.text));
+  });
+
   it('should POST 200 /:id trim', async () => {
     const res = await app.httpRequest().post('/someId').send({
       name: 'xiekw2010',
