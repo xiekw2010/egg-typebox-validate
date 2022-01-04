@@ -1,10 +1,14 @@
 import { Controller } from 'egg';
-import { Static, Type } from '@sinclair/typebox';
-import { Validate } from "../../../../../../decorator";
+import { Static, Type } from '../../../../../../typebox';
+import { ValidateFactory, Validate } from "../../../../../../decorator";
 
 const TYPEBOX_ID = Type.Object({
   id: Type.String(),
 })
+
+const ValidateWithRedirect = ValidateFactory(ctx => {
+  ctx.redirect('/422');
+});
 
 export const TYPEBOX_BODY = Type.Object({
   name: Type.String(),
@@ -53,6 +57,21 @@ export default class HomeController extends Controller {
     [TYPEBOX_BODY, ctx => ctx.request.body, (ctx, errors) => 'kaiwei custom error: ' + errors.map(e => e.message).join(':')],
   ])
   public async delete() {
+    const { ctx } = this;
+    const p: Static<typeof TYPEBOX_BODY> = ctx.request.body;
+    const res = await ctx.service.home.index({
+      version: p.version,
+    })
+    ctx.body = {
+      version: res,
+    };
+  }
+
+  @ValidateWithRedirect([
+    [TYPEBOX_ID, ctx => ctx.params],
+    [TYPEBOX_BODY, ctx => ctx.request.body],
+  ])
+  public async put():Promise<void> {
     const { ctx } = this;
     const p: Static<typeof TYPEBOX_BODY> = ctx.request.body;
     const res = await ctx.service.home.index({
