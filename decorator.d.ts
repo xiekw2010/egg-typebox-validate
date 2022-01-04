@@ -1,5 +1,5 @@
 import { Context } from 'egg';
-import { TSchema } from "@sinclair/typebox";
+import { TSchema } from "./typebox";
 import { ErrorObject } from 'ajv/dist/2019';
 declare type CustomErrorMessage = (ctx: Context, errors: ErrorObject[]) => string;
 declare type GetData = (ctx: Context, args: unknown[]) => unknown;

@@ -41,7 +41,7 @@ class HomeController extends Controller {
         required: false,
       },
     }, ctx.params);
-    
+
     // 写一遍 ts 的类型定义，为了后面拿参数定义
     const params: {
       id: string;
@@ -62,7 +62,7 @@ export default HomeController;
 这就是这个库想要解决的问题，对于参数校验，写一遍类型就够了：
 
 ```diff
-+ import { Static, Type } from '@sinclair/typebox';
++ import { Static, Type } from 'egg-typebox-validate/typebox';
 
 class HomeController extends Controller {
   async index() {
@@ -130,7 +130,7 @@ const plugin: EggPlugin = {
 3. 在业务代码中使用
 
 ```diff
-+ import { Static, Type } from '@sinclair/typebox';
++ import { Static, Type } from 'egg-typebox-validate/typebox';
 
 // 写在 controller 外面，静态化，性能更好，下面有 benchmark
 + const paramsSchema = Type.Object({
@@ -145,7 +145,7 @@ const plugin: EggPlugin = {
 class HomeController extends Controller {
   async index() {
     const { ctx } = this;
-    
+
     // 直接校验
 +   ctx.tValidate(paramsSchema, ctx.params);
     // 不用写 js 类型定义
@@ -181,7 +181,7 @@ async create() {
     Type.Object({ avatar: Type.String() }),
   ])
   ctx.tValidate(USER_TYPEBOX, ctx.request.body);
-  
+
   // 在编辑器都能正确得到提示
   // type User = { name: string; description?: string } & { avatar: string }
   const { name, description, avatar } = ctx.request.body as Static<typeof USER_TYPEBOX>;
@@ -205,9 +205,9 @@ async create() {
 ```
 
 2. 校验规则使用的是业界标准的 [json-schema](https://json-schema.org/) 规范，内置很多[开箱即用的类型](https://github.com/ajv-validator/ajv-formats#formats)。
- 
+
 ```js
-'date-time', 
+'date-time',
 'time',
 'date',
 'email',
@@ -229,7 +229,7 @@ async create() {
 
 egg-typebox-validate 底层使用的是 [ajv](https://github.com/ajv-validator/ajv), 官网上宣称是 _**The fastest JSON validator for Node.js and browser.**_
 
-结论是在静态化的场景下，ajv 的性能要比 parameter 好得多，快不是一个数量级，详见[benchmark](./benchmark/ajv-vs-parameter.mjs) 
+结论是在静态化的场景下，ajv 的性能要比 parameter 好得多，快不是一个数量级，详见[benchmark](./benchmark/ajv-vs-parameter.mjs)
 
 ```js
 suite
@@ -288,7 +288,7 @@ Fastest is #ajv define once
 1. `ctx.tValidate` 参数校验失败后，抛出错误，内部实现（错误码、错误标题等）逻辑和 `ctx.validate` 的保持一致
 
 ```diff
-+ import { Static, Type } from '@sinclair/typebox';
++ import { Static, Type } from 'egg-typebox-validate/typebox';
 
 ctx.tValidate(Type.Object({
   name: Type.String(),
@@ -298,7 +298,7 @@ ctx.tValidate(Type.Object({
 2. `ctx.tValidateWithoutThrow` 直接校验，不抛出错误
 
 ```diff
-+ import { Static, Type } from '@sinclair/typebox';
++ import { Static, Type } from 'egg-typebox-validate/typebox';
 
 const valid = ctx.tValidateWithoutThrow(Type.Object({
   name: Type.String(),
@@ -325,7 +325,7 @@ class HomeController extends Controller {
 + ])
   async index() {
     const { ctx } = this;
-    
+
     // 直接校验
 -   ctx.tValidate(paramsSchema, ctx.params);
 -   ctx.tValidate(bodySchema, ctx.request.body);
@@ -393,7 +393,7 @@ async someFunc() {
   const typebox = Type.Object({
     jsonString: Type.Optional(Type.String({ format: 'json-string' })),
   });
-  
+
   const res = ctx.tValidate(typebox, { a: '{"a":1}' }) // valid
   const res = ctx.tValidate(typebox, { a: 'wrong{"a":1}' }) // invalid
 }
@@ -417,7 +417,7 @@ config.typeboxValidate = {
         }
       }
     });
-    
+
 +   ajv.addFormat("semver", {
 +     type: "string",
 +     validate: (x) => valid(x) != null,
@@ -433,7 +433,7 @@ async someFunc() {
   const typebox = Type.Object({
     version: Type.String({ format: 'semver' }),
   });
-  
+
   const res = ctx.tValidate(typebox, { a: '1.0.0' }) // valid
   const res = ctx.tValidate(typebox, { a: 'a.b.c' }) // invalid
 }

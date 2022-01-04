@@ -1,5 +1,5 @@
 import { Service } from 'egg';
-import { Static, Type } from '@sinclair/typebox';
+import { Static, Type } from '../../../../../../typebox';
 import { Validate } from "../../../../../../decorator";
 import { TYPEBOX_BODY } from "../controller/home";
 

@@ -1,8 +1,8 @@
 import Benchmark from 'benchmark';
 import addFormats from 'ajv-formats';
-import { Type } from '@sinclair/typebox';
 import Ajv from 'ajv';
 import Parameter from 'parameter';
+import { Type } from '../typebox';
 
 const getAjvInstance = () =>
   addFormats(new Ajv({}), [
@@ -24,13 +24,13 @@ const getAjvInstance = () =>
     .addKeyword('kind')
     .addKeyword('modifier');
 
-const suite = new Benchmark.Suite;
+const suite = new Benchmark.Suite();
 
 const DATA = {
   name: 'xiekw2010',
   description: 'desc',
   location: 'shanghai',
-}
+};
 
 const ajv = getAjvInstance();
 const p = new Parameter();
@@ -38,8 +38,8 @@ const p = new Parameter();
 const typeboxRule = Type.Object({
   name: Type.String(),
   description: Type.Optional(Type.String()),
-  location: Type.Enum({shanghai: 'shanghai', hangzhou: 'hangzhou'}),
-})
+  location: Type.Enum({ shanghai: 'shanghai', hangzhou: 'hangzhou' }),
+});
 
 const parameterRule = {
   name: 'string',
@@ -48,22 +48,22 @@ const parameterRule = {
     required: false,
   },
   location: ['shanghai', 'hangzhou'],
-}
+};
 
 // add tests
 suite
-  .add('#ajv', function() {
+  .add('#ajv', () => {
     const rule = Type.Object({
       name: Type.String(),
       description: Type.Optional(Type.String()),
-      location: Type.Enum({shanghai: 'shanghai', hangzhou: 'hangzhou'}),
-    })
+      location: Type.Enum({ shanghai: 'shanghai', hangzhou: 'hangzhou' }),
+    });
     ajv.validate(rule, DATA);
   })
-  .add('#ajv define once', function() {
+  .add('#ajv define once', () => {
     ajv.validate(typeboxRule, DATA);
   })
-  .add('#parameter', function() {
+  .add('#parameter', () => {
     const rule = {
       name: 'string',
       description: {
@@ -71,21 +71,21 @@ suite
         required: false,
       },
       location: ['shanghai', 'hangzhou'],
-    }
+    };
     p.validate(rule, DATA);
   })
-  .add('#parameter define once', function() {
+  .add('#parameter define once', () => {
     p.validate(parameterRule, DATA);
   })
   // add listeners
-  .on('cycle', function(event) {
+  .on('cycle', event => {
     console.log(String(event.target));
   })
   .on('complete', function() {
     console.log('Fastest is ' + this.filter('fastest').map('name'));
   })
   // run async
-  .run({ 'async': true });
+  .run({ async: true });
 
 /*
 MacBook Pro(2.2 GHz 六核Intel Core i7)
