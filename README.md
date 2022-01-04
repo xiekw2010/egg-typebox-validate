@@ -316,7 +316,9 @@ if (valid) {
 3. ⭐⭐⭐ 装饰器 decorator `@Validate([ [rule1, ctx => ctx.xx1], [rule2, ctx => ctx.xx2] ])` 调用（写法更干净，推荐使用!️）
 
 ```diff
-+ import { Validate } from 'egg-typebox-validate/decorator';
++ import { Validate, ValidateFactory } from 'egg-typebox-validate/decorator';
+
+const ValidateWithRedirect = ValidateFactory(ctx => ctx.redirect('/422'));
 
 class HomeController extends Controller {
 + @Validate([
@@ -334,12 +336,16 @@ class HomeController extends Controller {
 
     ...
   }
+  @ValidateWithRedirect([paramsSchema, ctx => ctx.params])
+  async post() {
+    // ...
+  }
 }
 
 export default HomeController;
 ```
 
-目前装饰器只支持有 `this.ctx` 的 class 上使用，比如 controller，service 等。更多使用案例可以看这个项目里写的测试用例。
+目前装饰器只支持有 `this.ctx` 的 class 上使用，比如 controller，service 等。也可以通过内置的 `ValidateFactory` 自定义校验失败后的回调逻辑，更多使用案例可以看这个项目里写的测试用例。
 
 ## 怎么写 typebox 定义
 
