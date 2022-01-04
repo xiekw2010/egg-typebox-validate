@@ -336,7 +336,7 @@ class HomeController extends Controller {
 
     ...
   }
-  @ValidateWithRedirect([paramsSchema, ctx => ctx.params])
++ @ValidateWithRedirect([paramsSchema, ctx => ctx.params])
   async post() {
     // ...
   }
